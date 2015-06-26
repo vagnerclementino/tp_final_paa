@@ -10,6 +10,8 @@
 #include <stdexcept>      // std::out_of_range
 #include "../lib/PAAException.h"
 #include "PAAGraph.h"
+#include "InfluencerFind.h"
+#include <stdlib.h>
 
 namespace PAA {
 
@@ -46,6 +48,7 @@ void TPFinal::run(void){
 	try {
 		PAA::PAAGraph graph;
 		std::stringstream ss;
+		PAA::InfluencerFind finder;
 
 		this->showUserMessage("Iniciando a carga do grafo atraves do arquivo " + this->getInputFileName());
 		graph.load(this->getInputFileName());
@@ -54,6 +57,13 @@ void TPFinal::run(void){
 		ss << "Número de vértices adicionados: " <<  graph.getNumberOfVertex() << std::endl;
 		this->showUserMessage(ss.str());
 
+		finder.find(graph,this->getValueK());
+
+		finder.printInfluencers();
+
+		finder.writeToFile(this->getOutputFileName());
+
+		this->setFinalTime();
 
 	} catch (const PAA::PAAException& e) {
 
@@ -85,9 +95,39 @@ const std::string& TPFinal::getInputFileName(void)const{
 		return this->pProgArgs->at(this->INPUT_FILE_POS);
 	}catch (const std::out_of_range& oor) {
 
-		throw PAA::PAAException("TPFinal::getInputFileName", "Erro em recuperar a string de localização do arquivo de entrada. O indice informado não é válido: " + this->PROGRAM_NAME_POSITION);
+		throw PAA::PAAException("TPFinal::getInputFileName", "Erro em recuperar a string de localização do arquivo de entrada. O indice informado não é válido: " + this->INPUT_FILE_POS);
 
 	}
+
+}
+const std::string& TPFinal::getOutputFileName(void)const{
+
+	try {
+		return this->pProgArgs->at(this->OUTPUT_FILE_POS);
+	} catch (const std::out_of_range& oor) {
+
+		throw PAA::PAAException("TPFinal::getOutputFileName",
+				"Erro em recuperar a string de localização do arquivo de entrada. O indice informado não é válido: "
+						+ this->OUTPUT_FILE_POS);
+
+	}
+
+}
+
+int TPFinal::getValueK(void) const{
+
+		try {
+
+			return atoi(this->pProgArgs->at(this->K_VALUE_POS).c_str());
+
+		} catch (const std::out_of_range& oor) {
+
+			throw PAA::PAAException("TPFinal::getValueK",
+					"Erro em recuperar o tamanho k de influenciadores. O indice informado não é válido: "
+							+ this->K_VALUE_POS);
+
+		}
+
 
 }
 

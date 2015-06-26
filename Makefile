@@ -21,7 +21,8 @@ OBJS=$(SRC_FOLDER)/main.o \
 	 $(SRC_FOLDER)/Edge.o \
 	 $(SRC_FOLDER)/PAAGraph.o \
 	 $(SRC_FOLDER)/TPFinal.o \
-	 $(SRC_FOLDER)/Vertex.o
+	 $(SRC_FOLDER)/Vertex.o \
+	 $(SRC_FOLDER)/InfluencerFind.o
 INPUTFILE=$(-i ../inputs/input.txt)
 OUTPUTFILE=$(-o ../outputs/output.txt) 
 
@@ -67,10 +68,11 @@ Graph.o: Graph.h
 PAAGraph.o: PAAGraph.h PAAGraph.cpp
 	@$(CC) $(CFLAGS) $(PAA_LIB_PATH)/PAAGraph.cpp
 	
-TPFinal.o: TPGraph.h TPGraph.cpp
+TPFinal.o: TPFinal.h TPFinal.cpp
 	@$(CC) $(CFLAGS) $(PAA_LIB_PATH)/TPFinal.cpp
 
-
+InfluencerFind.o: InfluencerFind.h InfluencerFind.cpp
+	@$(CC) $(CFLAGS) $(PAA_LIB_PATH)/InfluencerFind.cpp
 	
 clean:
 	@echo "Removendo arquivos temporários e o executável..."

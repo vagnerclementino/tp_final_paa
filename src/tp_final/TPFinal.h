@@ -16,7 +16,7 @@ class TPFinal: public TrabalhoPratico {
 private:
 	//@atributes
 	//Definindo o número de argumentos do programa
-	static const int NUMBER_OF_ARGUMENTS = 5;
+	static const int NUMBER_OF_ARGUMENTS = 7;
 
 	//Definindo a posição do nome do programa
 	static const int PROGRAM_NAME_POSITION = 0;
@@ -26,6 +26,9 @@ private:
 
 	//Definindo a posição do arquivo de saida
 	static const int OUTPUT_FILE_POS = 4;
+
+	//Definindo a posição do valor k
+	static const int K_VALUE_POS = 6;
 
 	//Armazena os argumentos do programa
 	std::vector<std::string>* pProgArgs;
@@ -57,6 +60,10 @@ public:
 	const std::string& getProgramName(void)const;
 
 	const std::string& getInputFileName(void)const;
+
+	const std::string& getOutputFileName(void)const;
+
+	int getValueK(void) const;
 };
 
 
