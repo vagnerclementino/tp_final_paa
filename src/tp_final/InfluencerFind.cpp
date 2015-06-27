@@ -14,8 +14,9 @@ namespace PAA {
 InfluencerFind::InfluencerFind() {
 
 	this->maxInfluencers = 0;
-	this->pFM = new PAA::FileManager();
-	this->pVectorInfluencers = new std::vector<PAA::Vertex*>();
+	this->fm= PAA::FileManager();
+	this->influencers = std::vector<PAA::Vertex*>();
+	this->vertexCover = std::vector<PAA::Vertex*>();
 }
 
 int InfluencerFind::getMaxInfluencers() const {
@@ -27,15 +28,7 @@ void InfluencerFind::setMaxInfluencers(int maxInfluencers) {
 }
 
 InfluencerFind::~InfluencerFind() {
-	if(this->pFM != NULL){
-		delete pFM;
-	}
-
-	if(this->pVectorInfluencers != NULL){
-
-		delete pVectorInfluencers;
-
-	}
+	//Não houve alocação dinamica
 }
 
 void InfluencerFind::find(PAA::PAAGraph& graph, int k){
@@ -44,36 +37,56 @@ void InfluencerFind::find(PAA::PAAGraph& graph, int k){
 	std::vector<PAA::Vertex*> vertexCover;
 
 
-	vertexCover = this->getVertexCover(graph);
+	vertexCover = this->getAproxVertexCover(graph);
 
-	if(int(vertexCover.size()) <= k){
 
-		influencers = vertexCover;
+	this->setVectorVertexCover(vertexCover);
+
+	if (int(vertexCover.size()) <= k){
+
+		this->setVectorVertexCover(vertexCover);
 
 	}else{
 
 		influencers = this->chooseInfluencersVertex(vertexCover,k);
 
-
 	}
 
-	if(this->pVectorInfluencers != NULL){
 
-		*(this->pVectorInfluencers) = influencers;
-	}
 
 }
 void InfluencerFind::printInfluencers(void) const{
+	try{
 
-	std::cout << this->generateStringToPrint(this->pVectorInfluencers) << std::endl;
+		std::cout << this->generateStringToPrint(this->getVectorInfluencers()) << std::endl;
 
+
+	}catch (const PAAException& e) {
+
+		throw e;
+
+	}
+}
+
+void InfluencerFind::printVertexCover(void)const{
+
+	try {
+
+		std::cout << this->generateStringToPrint(this->getVectorVertexCover())
+				<< std::endl;
+
+	} catch (const PAAException& e) {
+
+		throw e;
+
+	}
 
 }
 void InfluencerFind::writeToFile(const std::string& fileName){
 	try{
 		this->openFile(fileName,'W');
 
-		this->pFM->writeToFile(this->generateStringToPrint(this->pVectorInfluencers));
+		this->fm.writeToFile(this->generateStringToPrint(this->influencers));
 
 		this->closeFile(fileName);
 
@@ -91,7 +104,7 @@ void InfluencerFind::openFile(const std::string& fileName, const char& mode){
 
 	try {
 
-		this->pFM->openFile(fileName, mode);
+		this->fm.openFile(fileName, mode);
 
 	} catch (const PAAException& e) {
 
@@ -103,7 +116,7 @@ void InfluencerFind::closeFile(const std::string& fileName){
 
 	try {
 
-		this->pFM->closeFile();
+		this->fm.closeFile();
 
 	} catch (const PAA::PAAException& e) {
 
@@ -112,26 +125,27 @@ void InfluencerFind::closeFile(const std::string& fileName){
 
 }
 
-std::string InfluencerFind::generateStringToPrint(std::vector<PAA::Vertex*>* influencers)const{
-	std::vector<PAA::Vertex*>::iterator it;
+std::string InfluencerFind::generateStringToPrint(const std::vector<PAA::Vertex*>& influencers)const{
+
+
 	std::stringstream ss;
 	int i = 0;
 
-	if ( influencers!= NULL && influencers->empty()) {
+
+	if ( influencers.empty()) {
 
 		ss << "{ }" << std::endl;
 	} else {
 
 		ss << "{";
 
-		for (it = influencers->begin();
-				it != influencers->end(); it++) {
+		for (unsigned int index = 0;index <= (influencers.size()-1); index++) {
 			if (i > 0) {
 				ss << ", ";
 			}
 			i++;
 
-			ss << (*it)->getName();
+			ss << influencers.at(index)->getName();
 
 		}
 		ss << "}";
@@ -141,13 +155,48 @@ std::string InfluencerFind::generateStringToPrint(std::vector<PAA::Vertex*>* inf
 
 }
 
-std::vector<PAA::Vertex*> InfluencerFind::getVertexCover(PAA::PAAGraph& graph){
+std::vector<PAA::Vertex*> InfluencerFind::getAproxVertexCover(PAA::PAAGraph& graph){
 
-	std::vector<PAA::Vertex*> vertexCover;
+	std::vector<PAA::Vertex*> aproxVertexCover;
+	std::set<PAA::Edge*> edgesSet;
+	std::set<PAA::Edge*>::iterator itEdges;
+	PAA::Edge* edgeAux;
+	PAA::Vertex* startVertex; //Start Vertex
+	PAA::Vertex* finishVertex;// End Vertex
+	int edgesRemoved = 0;
 
 
 
-	return vertexCover;
+	edgesSet = graph.getEdgeSet();
+
+	while(!edgesSet.empty()){
+
+		itEdges = edgesSet.begin();
+
+		edgeAux = (*itEdges);
+		edgesSet.erase(edgeAux);
+
+		//std::cout << edgeAux->toString() << std::endl;
+		startVertex = edgeAux->getStartVertex();
+
+		aproxVertexCover.push_back(startVertex);
+		//std::cout << "Adicionado o vértice " << startVertex->toString() << " para o Vertex Cover" << std::endl;
+
+		finishVertex = edgeAux->getFinishVertex();
+		aproxVertexCover.push_back(finishVertex);
+		//std::cout << "Adicionado o vértice " << finishVertex->toString() << " para o Vertex Cover" << std::endl;
+
+		//Remove de edgesSet toda aresta incidente para startVertex ou finishVertex
+		edgesRemoved += this->removeIncidentEdges(edgesSet,startVertex,finishVertex);
+		//std::cout << "Arestas removidos até o momento : " << edgesRemoved << std::endl;
+
+
+	}
+	//std::cout << edgesSet.size() << std::endl;
+	//std::cout << graph.getEdgeSet().size() << std::endl;
+
+
+	return aproxVertexCover;
 
 }
 
@@ -156,6 +205,60 @@ std::vector<PAA::Vertex*> InfluencerFind::chooseInfluencersVertex(std::vector<PA
 
 
 	return influencersVertex;
+}
+
+const std::vector<PAA::Vertex*>& InfluencerFind::getVectorInfluencers() const {
+	return this->influencers;
+}
+
+void InfluencerFind::setVectorInfluencers(const std::vector<PAA::Vertex*>& vectorInfluencers) {
+	influencers = vectorInfluencers;
+}
+
+const std::vector<PAA::Vertex*>& InfluencerFind::getVectorVertexCover() const {
+	return this->vertexCover;
+}
+
+void InfluencerFind::setVectorVertexCover(const std::vector<PAA::Vertex*>& vectorVertexCover) {
+	this->vertexCover = vectorVertexCover;
+}
+
+int InfluencerFind::removeIncidentEdges(std::set<PAA::Edge*>& edgeSet, PAA::Vertex* startVertex, PAA::Vertex* finishVertex){
+
+	std::set<PAA::Edge*>::iterator it;
+	int edgeRemoved = edgeSet.size();
+
+
+	for(it = edgeSet.begin(); it != edgeSet.end(); it++){
+
+
+
+		if( (*it)->getStartVertex() == startVertex || (*it)->getFinishVertex() == startVertex){
+
+			edgeSet.erase((*it));
+			//std::cout << "Removido a a aresta " << (*it) ->toString() << std::endl;
+
+		}
+
+		if( (*it)->getStartVertex() == finishVertex || (*it)->getFinishVertex() == finishVertex){
+
+			edgeSet.erase((*it));
+			//std::cout << "Removido a a aresta " << (*it) ->toString() << std::endl;
+
+
+		}
+	}
+	edgeRemoved -= edgeSet.size();
+
+	return edgeRemoved;
+
+
+}
+
+unsigned int InfluencerFind::getVertexConverSize(void){
+
+	return this->vertexCover.size();
+
 }
 
 } /* namespace PAA */

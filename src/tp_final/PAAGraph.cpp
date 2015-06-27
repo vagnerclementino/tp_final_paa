@@ -285,7 +285,7 @@ void PAAGraph::load(const std::string& filePath){
 					//std::cout << "Adicionado o vértice " << this->getVertex(valuesRead.at(1))->toString() << std::endl;
 				}
 
-				this->addEdge(valuesRead.at(0), valuesRead.at(1),1.0,true);
+				this->addEdge(valuesRead.at(0), valuesRead.at(1),1,true);
 
 			 }
 		}

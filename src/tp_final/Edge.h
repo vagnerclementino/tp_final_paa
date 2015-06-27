@@ -38,7 +38,7 @@ public:
 	void setFinishVertex(PAA::Vertex*);
 
 	//Métodos para acesso e manipulação do atributo cost/weight
-	double& getWeight(void) const;
+	double getWeight(void) const;
 	void setWeight(double);
 
 	//Métodos para acesso e manipulação do atributo visited

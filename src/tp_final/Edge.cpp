@@ -92,9 +92,9 @@ std::ostream& operator<<(std::ostream& out, const PAA::Edge& edge) {
 
 	}
 
-	double& Edge::getWeight(void) const{
+	double Edge::getWeight(void) const{
 
-		return this->weight;
+		return this->cost;
 
 	}
 

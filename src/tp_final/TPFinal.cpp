@@ -54,11 +54,18 @@ void TPFinal::run(void){
 		graph.load(this->getInputFileName());
 		this->showUserMessage("Finalizando a carga do grafo.");
 
-		ss << "Número de vértices adicionados: " <<  graph.getNumberOfVertex() << std::endl;
+		ss << "Número de vértices adicionados: " <<  graph.getNumberOfVertex();
 		this->showUserMessage(ss.str());
 
+		//limpando o buffer string
+		ss.str(std::string());
+
+		//Buscando o k maiores influenciadores
+		ss << "Buscando os " << this->getValueK() << " maiores influenciadores...";
+		this->showUserMessage(ss.str());
 		finder.find(graph,this->getValueK());
 
+		finder.printVertexCover();
 		finder.printInfluencers();
 
 		finder.writeToFile(this->getOutputFileName());
@@ -67,10 +74,8 @@ void TPFinal::run(void){
 
 	} catch (const PAA::PAAException& e) {
 
-		throw PAAException(e.getDebugMessage());
+		throw e;
 	}
-
-
 }
 
 void TPFinal::setFinalTime(void){
@@ -130,5 +135,7 @@ int TPFinal::getValueK(void) const{
 
 
 }
+
+
 
 } /* namespace PAA */
