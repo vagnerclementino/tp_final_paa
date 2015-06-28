@@ -49,10 +49,14 @@ void TPFinal::run(void){
 		PAA::PAAGraph graph;
 		std::stringstream ss;
 		PAA::InfluencerFind finder;
+		std::set<PAA::Vertex*>::iterator it;
+
 
 		this->showUserMessage("Iniciando a carga do grafo atraves do arquivo " + this->getInputFileName());
 		graph.load(this->getInputFileName());
 		this->showUserMessage("Finalizando a carga do grafo.");
+
+
 
 		ss << "Número de vértices adicionados: " <<  graph.getNumberOfVertex();
 		this->showUserMessage(ss.str());
@@ -63,10 +67,35 @@ void TPFinal::run(void){
 		//Buscando o k maiores influenciadores
 		ss << "Buscando os " << this->getValueK() << " maiores influenciadores...";
 		this->showUserMessage(ss.str());
+		//limpando o buffer string
+		ss.str(std::string());
+
+
 		finder.find(graph,this->getValueK());
+
+		ss << "Total de vértice no vertex cover: " << finder.getVertexConverSize();
+		this->showUserMessage(ss.str());
+		ss.str(std::string());
 
 		finder.printVertexCover();
 		finder.printInfluencers();
+
+		graph.resetData();
+
+		/*
+		 * Realiza uma simulação para verificar quantas pessoas compraria um
+		 * determinado produto caso os "influencers" iniciasse a recomendação do produto
+		 */
+		finder.analyze(graph);
+
+		for(it = graph.getVertexSet().begin(); it != graph.getVertexSet().end();it++){
+
+			ss << (*it)->getName() << ": " << (*it)->getInclination() << "| ";
+
+		}
+		ss << std::endl;
+
+		this->showUserMessage(ss.str());
 
 		finder.writeToFile(this->getOutputFileName());
 

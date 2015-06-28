@@ -8,6 +8,8 @@
 #include "InfluencerFind.h"
 #include "../lib/PAAException.h"
 #include <iostream>
+#include <queue>
+#include <algorithm>
 
 namespace PAA {
 
@@ -48,7 +50,9 @@ void InfluencerFind::find(PAA::PAAGraph& graph, int k){
 
 	}else{
 
-		influencers = this->chooseInfluencersVertex(vertexCover,k);
+		influencers = this->chooseInfluencersVertex(graph,vertexCover,k);
+
+		this->setVectorInfluencers(influencers);
 
 	}
 
@@ -145,8 +149,8 @@ std::string InfluencerFind::generateStringToPrint(const std::vector<PAA::Vertex*
 			}
 			i++;
 
-			ss << influencers.at(index)->getName();
-
+			ss << "Name: " << influencers.at(index)->getName() << ",";
+			ss << "Degree Access: " << influencers.at(index)->getDegreeAccess();
 		}
 		ss << "}";
 	}
@@ -200,11 +204,30 @@ std::vector<PAA::Vertex*> InfluencerFind::getAproxVertexCover(PAA::PAAGraph& gra
 
 }
 
-std::vector<PAA::Vertex*> InfluencerFind::chooseInfluencersVertex(std::vector<PAA::Vertex*>& vertexCover, int k){
+std::vector<PAA::Vertex*> InfluencerFind::chooseInfluencersVertex(PAA::PAAGraph& graph, std::vector<PAA::Vertex*>& vertexCover, int k){
+
 	std::vector<PAA::Vertex*> influencersVertex;
+	std::vector<PAA::Vertex*>::iterator it;
+	unsigned int degreeAcess = 0;
+
+	for(it = vertexCover.begin(); it != vertexCover.end(); it++){
+
+		degreeAcess = calculeDegreeAccess(graph, (*it));
+		(*it)->setDegreeAccess(degreeAcess);
+		std::cout << "Grau de acesso do vertice " << (*it)->getName() << ": " << degreeAcess << std::endl;
+		influencersVertex.push_back((*it));
+		//std::cout << "Resetando o grafo." << std::endl;
+
+		graph.resetData();
+
+	}
+
+	std::sort(influencersVertex.begin(),influencersVertex.end(),sortByDegreeAcces);
 
 
-	return influencersVertex;
+	std::vector<PAA::Vertex*> returnVector(influencersVertex.begin(),influencersVertex.begin()+k);
+
+	return returnVector;
 }
 
 const std::vector<PAA::Vertex*>& InfluencerFind::getVectorInfluencers() const {
@@ -258,6 +281,167 @@ int InfluencerFind::removeIncidentEdges(std::set<PAA::Edge*>& edgeSet, PAA::Vert
 unsigned int InfluencerFind::getVertexConverSize(void){
 
 	return this->vertexCover.size();
+
+}
+
+unsigned int InfluencerFind::calculeDegreeAccess(PAA::PAAGraph& graph, PAA::Vertex* root){
+
+	unsigned int degreeAccess = 0;
+	std::queue<PAA::Vertex*> vertexQueue;
+	std::set<PAA::Vertex*> adjList;
+	PAA::Vertex* auxVertex;
+	std::set<PAA::Vertex*>::iterator it;
+
+	std::cout << "Calculando DegreeAccess: " << root->getName() << std::endl;
+	vertexQueue.push(root);
+
+
+
+	while (!vertexQueue.empty()){
+
+		auxVertex = vertexQueue.front();
+		vertexQueue.pop();
+
+		std::cout << "Vertic em analise : " << auxVertex->getName() << std::endl;
+
+		adjList = auxVertex->getAdjList();
+
+		for(it = adjList.begin(); it != adjList.end(); it++){
+
+
+
+			if((*it) == NULL){
+				throw PAA::PAAException("InfluencerFind::calculeDegreeAccess", "Encontrado um vizinho no nulo no vértide " + root->getName());
+			}
+
+			std::cout << "Vertice vizinho avaliado: " << (*it)->getName() << std::endl;
+			if((*it)->getColor() == WHITE){
+				(*it)->setColor(GREY);
+				degreeAccess++;
+				vertexQueue.push((*it));
+			}
+
+		}
+		adjList.clear();
+		auxVertex->setColor(BLACK);
+
+	}
+	return degreeAccess;
+}
+
+
+float InfluencerFind::generateRandomInclination(void){
+
+	float randomInclination;
+
+	randomInclination = float ( (rand() % 100) + 1 ) / 100;
+
+	return randomInclination;
+
+
+}
+
+
+void InfluencerFind::setRandomInclination(PAA::PAAGraph& graph){
+
+
+
+	float randomInclination;
+	float inclinatinoCumulative = 0.0;
+
+
+	std::queue<PAA::Vertex*> vertexQueue;
+	std::set<PAA::Vertex*> adjList;
+	PAA::Vertex* auxVertex;
+	std::set<PAA::Vertex*>::iterator it;
+	std::set<PAA::Vertex*>::iterator itAdj;
+	//Atribuindo uma semente aleatória
+	srand(time(0));
+
+	for(it = graph.getVertexSet().begin(); it != graph.getVertexSet().end(); it++){
+
+		randomInclination = this->generateRandomInclination();
+
+		(*it)->setInclination(randomInclination);
+
+		std::cout << "Atrubuida a inclination " << (*it)->getInclination()
+				<< " para o vértice " << (*it)->getName() << std::endl;
+
+
+		vertexQueue.push((*it));
+
+		while (!vertexQueue.empty()) {
+
+			auxVertex = vertexQueue.front();
+			vertexQueue.pop();
+			inclinatinoCumulative = 0.0;
+
+			std::cout << "Vertice em analise : " << auxVertex->getName()<< std::endl;
+
+			if(auxVertex->getInclination() == 0){
+				auxVertex->setInclination(this->generateRandomInclination());
+			}
+
+			adjList = auxVertex->getAdjList();
+
+			for (itAdj = adjList.begin(); itAdj != adjList.end(); itAdj++) {
+
+				if ((*itAdj) == NULL) {
+					throw PAA::PAAException(
+							"InfluencerFind::setRandomInclination","Encontrado um vizinho no nulo no vértide " + auxVertex->getName());
+				}
+
+				std::cout << "Vertice vizinho avaliado: " << (*itAdj)->getName() << std::endl;
+				if ((*itAdj)->getColor() == WHITE) {
+					(*itAdj)->setColor(GREY);
+
+					inclinatinoCumulative += (*itAdj)->getInclination();
+
+					if(inclinatinoCumulative < 1.0){
+						while(true){
+
+							randomInclination = this->generateRandomInclination();
+
+							std::cout << (randomInclination + inclinatinoCumulative ) << std::endl;
+
+							if(float(randomInclination + inclinatinoCumulative ) <= 1.0){
+								break;
+
+							}
+
+						};
+
+						(*itAdj)->setInclination(randomInclination);
+
+						inclinatinoCumulative+=randomInclination;
+
+					}else{
+
+						(*itAdj)->setInclination(0);
+					}
+
+					vertexQueue.push((*itAdj));
+				}
+
+			}
+			adjList.clear();
+			auxVertex->setColor(BLACK);
+
+		}
+
+	}
+
+}
+
+void InfluencerFind::analyze(PAA::PAAGraph& graph){
+	try {
+		this->setRandomInclination(graph);
+
+
+	} catch (const PAA::PAAException& e) {
+
+		throw e;
+	}
 
 }
 

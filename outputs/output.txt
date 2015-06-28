@@ -1,2 +1,1 @@
-{ }
-
+{Name: b,Degree Access: 6, Name: a,Degree Access: 6}

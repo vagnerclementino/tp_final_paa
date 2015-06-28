@@ -35,8 +35,10 @@ private:
 	bool visited;       		 // Define se o vértice já foi visitado; valor padrão igual false
 	PAA::Color color;			// Define a cor de vértice; valor padrão BRANCO
 	Vertex* previous;   		// Vértice que vem antes deste, valor padrão igual a NULL
-	bool isSybil;			    // Define se o um vértice é Sybil - Default TRUE
-
+	bool isSybil;				// Define se o um vértice é Sybil - Default TRUE
+	unsigned int  degreeAccess;  //Define o número de vertice que podem ser acessados a partir deste
+	float inclination;			 //Determina o quanto um vértice (pessoa) deseja comprar um produto, deve ser no máximo 1
+	bool active;				 //Se true o vertice (pessoa) comprou o produto, do contrário, ela não o adquiriu
 public:
 	Vertex(const std::string& name = "");
 	//Construtor para construçaõ de uma cópia
@@ -110,8 +112,11 @@ public:
 	//Calcula o coeficiente de agrupamento de um vértice
 	float getCusteringCoefficient(void);
 
-
-
+	std::set<PAA::Vertex*> getAdjList(void) const;
+	unsigned int getDegreeAccess() const;
+	void setDegreeAccess(unsigned int degreeAccess);
+	float getInclination() const;
+	void setInclination(float inclination);
 };
 
 	//Método para permitir que o vértice seja impresso em stream de saída
@@ -120,6 +125,8 @@ public:
 	bool sortByDegree(PAA::Vertex* v1, PAA::Vertex* v2);
 
 	bool sortByName(PAA::Vertex* v1, PAA::Vertex* v2);
+
+	bool sortByDegreeAcces(PAA::Vertex* v1, PAA::Vertex* v2);
 
 
 } /* namespace PAA */

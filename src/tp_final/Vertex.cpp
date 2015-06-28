@@ -8,6 +8,9 @@
 #include "Vertex.h"
 #include <sstream>
 #include "../lib/PAAException.h"
+#include <iostream>
+#include <math.h>
+#include <exception>      // std::exception
 
 namespace PAA {
 
@@ -15,6 +18,7 @@ Vertex::Vertex(const std::string& vetexName):edges(arcs) {
 
 	this->name = vetexName;
 	this->previous = NULL;
+	this->degreeAccess = 0;
 	//Definindo valor padrão para os atributos
 	this->resetData();
 
@@ -42,6 +46,7 @@ void Vertex::resetData() {
     this->setVisited(false);
     this->setColor(WHITE);
     this->setIsSybil(true);
+    this->setInclination(0.0);
 
 
 
@@ -106,7 +111,10 @@ bool sortByName(PAA::Vertex* v1, PAA::Vertex* v2){
 	return v1->getName() < v2->getName();
 }
 
+bool sortByDegreeAcces(PAA::Vertex* v1, PAA::Vertex* v2){
 
+	return v1->getDegreeAccess() < v2->getDegreeAccess();
+}
 
 const std::string& Vertex::getName(void)const{
 
@@ -158,11 +166,25 @@ bool Vertex::getIsSybil(void) const{
 //Métodos para acesso e alteração do atributo 'Color'
 PAA::Color Vertex::getColor(void) const{
 
+	//std::cout << "Recuperando a cor do vertice: " << this->getName() << " atual : " << this->color << std::endl;
+
 	return this->color;
 }
 void Vertex::setColor(PAA::Color newColor){
+	std::stringstream ss;
 
-	this->color = newColor;
+
+
+	try{
+		//std::cout << "Definindo a cor do vertex: " << this->getName() << " para a cor "<< newColor << std::endl;
+		this->color = newColor;
+
+	}catch (const std::exception& e) {
+		ss << "Erro em alterar a cor do vértice para " << newColor << "Detalhes: " << e.what() << std::endl;
+		throw PAA::PAAException ("Vertex::setColor", ss.str() );
+	}
+
+
 
 }
 
@@ -382,5 +404,48 @@ float Vertex::getCusteringCoefficient(void){
 	return custeringCoefficient;
 }
 
+unsigned int Vertex::getDegreeAccess() const {
+	return degreeAccess;
+}
 
+float Vertex::getInclination() const {
+	return inclination;
+}
+
+void Vertex::setInclination(float inclination) {
+
+
+
+	if(inclination >= 0 && inclination <= 1.0){
+
+		this->inclination = floorf (inclination * 100 ) / 100;
+		std::cout << "Atribuido a inclination " << this->getInclination() << " para o vértice " << this->getName() << std::endl;
+
+	}else{
+		std::stringstream ss;
+		ss << "O valor da inclination informado " << inclination << " não é válido." << std::endl;
+		throw PAA::PAAException("Vertex::setInclination", ss.str());
+	}
+
+}
+
+void Vertex::setDegreeAccess(unsigned int degreeAccess) {
+	this->degreeAccess = degreeAccess;
+}
+
+std::set<PAA::Vertex*> Vertex::getAdjList(void) const{
+
+	std::set<Vertex*> adjList = std::set<PAA::Vertex*> ();
+	std::set<Edge*>::iterator itEdges;
+	for (itEdges = edges.begin(); itEdges != edges.end(); itEdges++) {
+
+		if ((*itEdges)->getFinishVertex() != NULL) {
+
+			adjList.insert((*itEdges)->getFinishVertex());
+
+		}
+
+	}
+	return adjList;
+}
 } /* namespace PAA */
