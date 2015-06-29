@@ -49,7 +49,16 @@ void TPFinal::run(void){
 		PAA::PAAGraph graph;
 		std::stringstream ss;
 		PAA::InfluencerFind finder;
-		std::set<PAA::Vertex*>::iterator it;
+		std::vector<int> valuesTest = std::vector<int>();
+		std::vector<int>::iterator it;
+
+		valuesTest.push_back(5);
+		valuesTest.push_back(10);
+		valuesTest.push_back(15);
+		valuesTest.push_back(20);
+		valuesTest.push_back(25);
+		valuesTest.push_back(30);
+
 
 
 		this->showUserMessage("Iniciando a carga do grafo atraves do arquivo " + this->getInputFileName());
@@ -58,46 +67,62 @@ void TPFinal::run(void){
 
 
 
-		ss << "Número de vértices adicionados: " <<  graph.getNumberOfVertex();
+		ss << "Total de vértice no grafo: " <<  graph.getNumberOfVertex();
 		this->showUserMessage(ss.str());
+
+		finder.setTotalVertex(graph.getNumberOfVertex());
 
 		//limpando o buffer string
 		ss.str(std::string());
 
-		//Buscando o k maiores influenciadores
-		ss << "Buscando os " << this->getValueK() << " maiores influenciadores...";
-		this->showUserMessage(ss.str());
-		//limpando o buffer string
-		ss.str(std::string());
 
+		this->showUserMessage("Buscando a cobertura de vertice aproximada para o grafo...");
 
-		finder.find(graph,this->getValueK());
+		finder.getAproxVertexCover(graph);
 
-		ss << "Total de vértice no vertex cover: " << finder.getVertexConverSize();
-		this->showUserMessage(ss.str());
-		ss.str(std::string());
-
+		this->showUserMessage("Cobertura de vértice encontrada: ");
 		finder.printVertexCover();
-		finder.printInfluencers();
 
-		graph.resetData();
+		this->showUserMessage("Calculando o Degree Access para os vértices no Cover Vertex...");
+		finder.calculeAllDegreeAccess(graph);
 
-		/*
-		 * Realiza uma simulação para verificar quantas pessoas compraria um
-		 * determinado produto caso os "influencers" iniciasse a recomendação do produto
-		 */
-		finder.analyze(graph);
+		this->showUserMessage("Atribuindo valores aleatórios para a inclinação dos vértices...");
+		//Atribuindo inclinações aleatórias para os vértices
+		finder.setRandomInclination(graph);
 
-		for(it = graph.getVertexSet().begin(); it != graph.getVertexSet().end();it++){
+		for(it = valuesTest.begin(); it != valuesTest.end();it++){
 
-			ss << (*it)->getName() << ": " << (*it)->getInclination() << "| ";
+			//Buscando o k maiores influenciadores
+			ss << "Buscando os " << (*it) << " maiores influenciadores...";
+			this->showUserMessage(ss.str());
+			//limpando o buffer string
+			ss.str(std::string());
+			finder.find((*it));
+
+			graph.resetData();
+
+			/*
+			 * Realiza uma simulação para verificar quantas pessoas compraria um
+			 * determinado produto caso os "influencers" iniciasse a recomendação do produto
+			 */
+			this->showUserMessage("Propagando a informação conforme o modelo de propagação Linear Threshold Model");
+
+			finder.analyze(graph);
+
+			//finder.printVertexCover();
+			//finder.printInfluencers();
+			//finder.printActiveVertex();
+
+			ss << "./outputs/output_k=" << (*it) << ".txt";
+
+			finder.writeToFile(ss.str());
+			this->showUserMessage("Resultado escrito no arquivo " + ss.str());
+
+			//limpando o buffer string
+			ss.str(std::string());
 
 		}
-		ss << std::endl;
 
-		this->showUserMessage(ss.str());
-
-		finder.writeToFile(this->getOutputFileName());
 
 		this->setFinalTime();
 

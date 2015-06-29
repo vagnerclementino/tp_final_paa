@@ -117,6 +117,8 @@ public:
 	void setDegreeAccess(unsigned int degreeAccess);
 	float getInclination() const;
 	void setInclination(float inclination);
+	bool isActive() const;
+	void setActive(bool active);
 };
 
 	//Método para permitir que o vértice seja impresso em stream de saída

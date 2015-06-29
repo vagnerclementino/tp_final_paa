@@ -19,6 +19,7 @@ Vertex::Vertex(const std::string& vetexName):edges(arcs) {
 	this->name = vetexName;
 	this->previous = NULL;
 	this->degreeAccess = 0;
+	this->inclination = 0;
 	//Definindo valor padrão para os atributos
 	this->resetData();
 
@@ -46,10 +47,7 @@ void Vertex::resetData() {
     this->setVisited(false);
     this->setColor(WHITE);
     this->setIsSybil(true);
-    this->setInclination(0.0);
-
-
-
+    //this->setInclination(0.0);
 }
 
 std::string Vertex::toString() const {
@@ -412,6 +410,14 @@ float Vertex::getInclination() const {
 	return inclination;
 }
 
+bool Vertex::isActive() const {
+	return active;
+}
+
+void Vertex::setActive(bool active) {
+	this->active = active;
+}
+
 void Vertex::setInclination(float inclination) {
 
 
@@ -419,7 +425,7 @@ void Vertex::setInclination(float inclination) {
 	if(inclination >= 0 && inclination <= 1.0){
 
 		this->inclination = floorf (inclination * 100 ) / 100;
-		std::cout << "Atribuido a inclination " << this->getInclination() << " para o vértice " << this->getName() << std::endl;
+		//std::cout << "Atribuido a inclination " << this->getInclination() << " para o vértice " << this->getName() << std::endl;
 
 	}else{
 		std::stringstream ss;
