@@ -49,17 +49,6 @@ void TPFinal::run(void){
 		PAA::PAAGraph graph;
 		std::stringstream ss;
 		PAA::InfluencerFind finder;
-		std::vector<int> valuesTest = std::vector<int>();
-		std::vector<int>::iterator it;
-
-		valuesTest.push_back(5);
-		valuesTest.push_back(10);
-		valuesTest.push_back(15);
-		valuesTest.push_back(20);
-		valuesTest.push_back(25);
-		valuesTest.push_back(30);
-
-
 
 		this->showUserMessage("Iniciando a carga do grafo atraves do arquivo " + this->getInputFileName());
 		graph.load(this->getInputFileName());
@@ -90,39 +79,30 @@ void TPFinal::run(void){
 		//Atribuindo inclinações aleatórias para os vértices
 		finder.setRandomInclination(graph);
 
-		for(it = valuesTest.begin(); it != valuesTest.end();it++){
+		//Buscando o k maiores influenciadores
+		ss << "Buscando os " << this->getValueK() << " maiores influenciadores...";
+		this->showUserMessage(ss.str());
+		//limpando o buffer string
+		ss.str(std::string());
+		finder.find(this->getValueK());
 
-			//Buscando o k maiores influenciadores
-			ss << "Buscando os " << (*it) << " maiores influenciadores...";
-			this->showUserMessage(ss.str());
-			//limpando o buffer string
-			ss.str(std::string());
-			finder.find((*it));
+		graph.resetData();
 
-			graph.resetData();
+		/*
+		 * Realiza uma simulação para verificar quantas pessoas compraria um
+		 * determinado produto caso os "influencers" iniciasse a recomendação do produto
+		 */
+		this->showUserMessage("Propagando a informação conforme o modelo de propagação Linear Threshold Model");
+		finder.analyze(graph);
 
-			/*
-			 * Realiza uma simulação para verificar quantas pessoas compraria um
-			 * determinado produto caso os "influencers" iniciasse a recomendação do produto
-			 */
-			this->showUserMessage("Propagando a informação conforme o modelo de propagação Linear Threshold Model");
+		//finder.printVertexCover();
+		//finder.printInfluencers();
+		//finder.printActiveVertex();
 
-			finder.analyze(graph);
 
-			//finder.printVertexCover();
-			//finder.printInfluencers();
-			//finder.printActiveVertex();
 
-			ss << "./outputs/output_k=" << (*it) << ".txt";
-
-			finder.writeToFile(ss.str());
-			this->showUserMessage("Resultado escrito no arquivo " + ss.str());
-
-			//limpando o buffer string
-			ss.str(std::string());
-
-		}
-
+		finder.writeToFile(this->getOutputFileName());
+		this->showUserMessage("Resultado escrito no arquivo " + this->getOutputFileName());
 
 		this->setFinalTime();
 
