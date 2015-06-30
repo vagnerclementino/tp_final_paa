@@ -1,0 +1,18 @@
+#Total de Vértices no grafo
+7
+#Tamanho do vertex cover encontrado
+6
+#Vertex Cover Aproximado
+{b, a, c, e, d, f}
+#Total de influenciadores
+5
+#Influenciadores encontrados
+{b, a, c, e, d}
+#Total de vértices ativos
+5
+#Vértices ativos
+{b, a, c, e, d}
+#Fração de vértices ativos (|ATIVOS| / |V|)
+0.71
+#####################################################
+

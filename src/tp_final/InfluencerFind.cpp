@@ -474,7 +474,7 @@ void InfluencerFind::setRandomInclination(PAA::PAAGraph& graph){
 
 								randomInclination = this->generateRandomInclination(1.0 - inclinatinoCumulative);
 
-								std::cout << (randomInclination + inclinatinoCumulative ) << std::endl;
+								//std::cout << (randomInclination + inclinatinoCumulative ) << std::endl;
 
 								if(float(randomInclination + inclinatinoCumulative ) <= 1.0){
 									break;
@@ -522,9 +522,6 @@ void InfluencerFind::analyze(PAA::PAAGraph& graph){
 
 		unsigned int influencersSize = 0;
 		float inclinatinoCumulative = 0.0;
-
-		//Atribuindo inclinações aleatórias para os vértices
-		this->setRandomInclination(graph);
 
 		graph.resetData();
 
