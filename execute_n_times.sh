@@ -8,7 +8,7 @@ OUTPUTS_DIR="./outputs"
 readonly OUTPUTS_DIR
 RUN_TIMES="10"
 readonly RUN_TIMES
-K_VALUE="25"
+K_VALUE="30"
 i="1"
 for((n=0;n<$RUN_TIMES;n++));
 do

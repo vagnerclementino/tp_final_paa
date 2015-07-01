@@ -171,11 +171,11 @@ A estrutura de dados básica utilizada neste trabalho foi um grafo a fim de repr
 
 Conforme exposto anteriormente, a fim de mensurar o valor $\cup_{j=1}^{k} w_{j}$ devemos definir um  \textit{Modelo de Propagação}. No trabalho proposto, será utilizado o modelo conhecido como \textit{Linear Threshold Model} \cite{granovetter1978threshold, schelling2006micromotives}{}. Neste modelo, um vértice $v$ é influenciado por cada um dos seus vizinhos $w$ de acordo com um peso $b_{v,w}$ que respeita a Equação \ref{eq:pesos_vizinhos}{}.
 
-O problema da \textit{Máxima Influência} pode ser modelado como um grafo não direcionado $G(V,E)${}, onde o conjunto de vértices $V$ representa os possíveis consumidores e as arestas $E$ representam os relacionamentos entre os mesmos. O processo de propagação das informações utilizará \textit{Linear Threshold Model}. Desta forma, para cada consumidor $v \in V$ será atribuído aleatoriamente um threshold $\theta_v$ no intervalo $[0, 1]$. As arestas em $E$ serão ponderadas com os valores $b_{v,w}$ respeitando à Equação \ref{eq:pesos_vizinhos}. Cada vértice $v \in V$ terá um atributo determinando se ele está ativo, sendo que ante da execução do algoritmo todos estarão com o valor \textit{não ativo}{}.
-
 \begin{equation} \label{eq:pesos_vizinhos}
 \sum\limits_{\textrm{w vizinho de v}}{b_{v,w} \leq 1}
 \end{equation}
+
+O problema da \textit{Máxima Influência} pode ser modelado como um grafo não direcionado $G(V,E)${}, onde o conjunto de vértices $V$ representa os possíveis consumidores e as arestas $E$ representam os relacionamentos entre os mesmos. O processo de propagação das informações utilizará \textit{Linear Threshold Model}. Desta forma, para cada consumidor $v \in V$ será atribuído aleatoriamente um threshold $\theta_v$ no intervalo $[0, 1]$. As arestas em $E$ serão ponderadas com os valores $b_{v,w}$ respeitando à Equação \ref{eq:pesos_vizinhos}. Cada vértice $v \in V$ terá um atributo determinando se ele está ativo, sendo que antes da execução do algoritmo todos estarão com o valor \textit{não ativo}{}.
 
 Para cada vértice $v$ é definido aleatoriamente um \textit{threshold} $\theta_v$ no intervalo $[0, 1]$; este limiar representa a fração dos vizinhos que deve se tornar ativa para que o vértice $v$ torne-se ativo. Dada uma escolha aleatória dos \textit{threshold} e um conjunto inicial de nós ativos $A_{0}$ (sendo os demais nós inativos), o processo de difusão ocorre da seguinte forma: na etapa $t$, todos os nós que estavam ativos na etapa $t-1$ permanecem ativos, e um vértice $v$ qualquer se torna \textit{ativo} se o somatório dos pesos de seus vizinhos \textit{ativos} sejam $\geq \theta_v$, conforme Equação \ref{eq:ativacao}{}. Cabe ressaltar que o conceito de \textit{ativação} de um vértice depende do contexto que o modelo está sendo aplicado. Neste trabalho considera que um vértice $v$ foi ativado se ele comprou um determinado produto anunciado.
 
@@ -188,98 +188,120 @@ Conforme pode ser observado, ao se aplicar \textit{Linear Threshold Model} o pro
 \subsection{Análise Experimental}
 \label{subsec:experimentos}
 
-A fim de avaliar a heurística proposta se faz necessário  utilização de um conjunto de dados que apresente as características estruturais de uma rede social de grande escala. Desta forma, de maneira análoga ao trabalho de \cite{kempe2003maximizing}, será utilizado um grafo de colaboração obtido a partir de coautorias em publicações de física \cite{snapnets}. Têm sido mostrado que redes de coautoria são capazes de capturar as principais características das redes sociais de modo mais geral \cite{newman2001structure}.
+A fim de avaliar a heurística proposta se faz necessário  utilização de um conjunto de dados que apresente as características estruturais de uma rede social de grande escala. Desta forma, de maneira análoga ao trabalho de \cite{kempe2003maximizing}, foi utilizado um grafo de colaboração de coautorias em publicações de física \cite{snapnets}. Têm sido mostrado que redes de coautoria são capazes de capturar as principais características das redes sociais de modo mais geral \cite{newman2001structure}. Neste sentido, a utilização de uma rede coautoria possibilita resultados semelhantes àqueles obtidos de grafos de redes sociais.
 
-O gráfico colaboração contém um vértice para cada pesquisador que tem pelo menos um artigo como coautor banco de dados da \textit{arXiv}\footnote{\url{http://arxiv.org/}}. Caso um artigo tenha dois ou mais autores, o dataset  possui uma aresta para cada par de autores. Observe que isso resulta em arestas paralelas quando dois pesquisadores estão como coautores de vários artigos. O gráfico resultante possui 9877 vértices e 25998 arestas e compreende de artigos publicados no período de janeiro de 1993 a abril de 2003 (124 meses). O data está disponível para download em \url{https://snap.stanford.edu/data/ca-HepTh.html}.
+O gráfico colaboração contém um vértice para cada pesquisador que tem pelo menos um artigo como coautor banco de dados da \textit{arXiv}\footnote{\url{http://arxiv.org/}}. Caso um artigo tenha dois ou mais autores, o dataset  possui uma aresta para cada par de autores. Observe que isso resulta em arestas paralelas quando dois pesquisadores estão como coautores de vários artigos. O gráfico resultante possui 9877 vértices e 51971 arestas e compreende de artigos publicados no período de janeiro de 1993 a abril de 2003 (124 meses). O data está disponível para download em \url{https://snap.stanford.edu/data/ca-HepTh.html}.
 
-As baterias de teste consistirão da execução da heurística proposta por 10 mil vezes. Este valor se justifica por ser o número de execução realizada pelo trabalho utilizado como baseline do trabalho. A cada nova execução os valores dos \textit{threshold} $\theta_v$ de cada vértice serão recalculados aleatoriamente com objetivo de remover qualquer viés que possa prejudicar os resultados do trabalho. Os dados que serão utilizados para comparação será o valor médio do conjunto $S$ obtido de todas as execuções. 
+As baterias de teste consistirão da execução da heurística proposta por 10 (dez) vezes para diversos valores de $k$ 10 mil vezes. A cada nova execução os valores dos \textit{threshold} $\theta_v$ de cada vértice serão recalculados aleatoriamente com objetivo de remover qualquer viés que possa prejudicar os resultados do trabalho. Os dados que serão utilizados para comparação será o valor médio do conjunto $S$ obtido de todas as execuções. 
 
+Visando comparar os resultados da heurística proposta com algum outro existente na literatura, foi escolhido o trabalho de \cite{kempe2003maximizing}. A opção por aquele trabalho se justifica pelo fato dele tentar resolver o mesmo problema utilizando, dentre outros o {Linear Threshold Model}{}. Para que a comparação pudesse ser realizada foi escolhido o mesmo \textit{dataset}\footnote{\url{https://snap.stanford.edu/data/ca-HepTh.html}} e os mesmos valores de $k$ escolhidos pelos autores.
 
+Em \cite{kempe2003maximizing} é proposto um algoritmo guloso que adiciona vértices ao conjunto $A_{0}$ visando maximizar o conjunto de vértices ativados (conjunto $S$). Os autores não entraram em detalhes sobre como escolheram vértices que efetivamente aumentam o tamanho de $S$. Todavia, eles utilizaram três outras heurísticas para validar o seu trabalho:
 
-
-
-\section{Resultados}
-\label{sec:resultados}
-
-Em \cite{kempe2003maximizing} foi proposto um algoritmo guloso que adiciona vértices ao conjunto $A_{0}$ que maximiza o conjunto $S$. Os autores não entraram em detalhes sobre como escolheram vértices que efetivamente aumentam o tamanho de $S$. Naquele trabalho, a heurística proposta foi comparada com três outras:
 \begin{itemize}
 	\item Na primeira abordagem os vértices em $A_{0}$ forame escolhidas randomicamente;
 	\item Na segunda heurística, foram escolhidos $k$ vértices em ordem decrescente de seus graus $d_{v}$;
 	\item A terceira abordagem utilizou o conceito de \textit{Distance centrality} \cite{scott2012social}, que é uma  medida influência largamente utilizada na sociologia, e parte do pressuposto de que vértices mais próximos terão mais chances de influenciar uns aos outros.
 \end{itemize}
 
-A heurística proposta por \cite{kempe2003maximizing}	teve um desempenho satisfatório comparada com as demais. Desta forma, este trabalho utilizará estas quatro heurísticas como baseline. Para tanto será utilizado o mesmo \textit{dataset} (vide Seção \ref{sec:experimentos}) e os mesmos valores para o atributo $k$.
-
-\begin{table}[h]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\rowcolor[HTML]{C0C0C0} 
-\multicolumn{1}{|c|}{\cellcolor[HTML]{C0C0C0}{\color[HTML]{000000} {\bf |V|}}} & {\color[HTML]{000000} {\bf k}} & {\color[HTML]{000000} {\bf |C|}} & {\color[HTML]{000000} {\bf |C| / |V|}} & \multicolumn{1}{l|}{\cellcolor[HTML]{C0C0C0}{\bf Vértices Ativos}} & {\color[HTML]{000000} {\bf \% Vértices Ativos}} \\ \hline
- & 5 & 8438 & 0,8543 & 2173 & 0,22 \\ \cline{2-6} 
- & 10 & 8438 & 0,8543 & 2173 & 0,22 \\ \cline{2-6} 
- & 15 & 8435 & 0,8540 & 2469 & 0,25 \\ \cline{2-6} 
- & 20 & 8433 & 0,8538 & 2766 & 0,28 \\ \cline{2-6} 
- & 25 & 8438 & 0,8543 & 2963 & 0,30 \\ \cline{2-6} 
-\multirow{-6}{*}{9877} & 30 & 8435 & 0,8540 & 2963 & 0,30 \\ \hline
-\end{tabular}
-}
-\caption{Resultados para diversos valores de k}
-\label{tab:results}
-\end{table}
-
-A partir de $A_{0}$ será executado o modelo de propagação \textit{Linear Threshold Model} que ao final da execução resultará em um conjunto $S \in V$ que contêm os vértices que foram ativados durante o processo. O tamanho de $S$ para diversos valores de $k$ serão comparados com o baseline descrito na  Seção \ref{sec:alg_exato}{}.
-
-\begin{itemize}
-		
-		\item Resultados da heurística melhor em média, mesmo para valor de $k$ menores
-		\item Variação do total de vértices ativados não acompanha o valor de $k$
-		\item Valor de $k= 25$ se mostrou o ideal.
-		\item Resultados bem abaixo da melhor solução \cite{Hochbaum:1996:ACP:241938.241941} 		
-		
-	\end{itemize}	
-
+A heurística proposta por \cite{kempe2003maximizing}	teve um desempenho satisfatório como o baseline por eles utilizados. A Figura \ref{fig:baseline} exibe os o total de vértices ativados para cada valor de $k$ para heurística proposto por Kempe et. al (linha "greedy") comparada com as demais heurísticas. Conforme exposto, o artigo citado não há a detalhes da implementação do algoritmo proposto, contudo, podemo será utilizados os resultados reportados para fim de comparação.
 
 \begin{figure}[!t]
 	\centering
 	\includegraphics[width=5.0in]{../img/grafico_baseline.eps}
-	\label{fig_vertex_cover}
+	\label{fig:baseline}
 	
 \end{figure}
+ 
+Os testes foram executados em computador com o sistema operacional Ubuntu versão 12.04 kernel 3.13.0-37-generic 64 bits e com 4GB de memória RAM. A bateria de testes teve um tempo total de execução superior à 10 horas.
+
+\section{Resultados}
+\label{sec:resultados}
+
+A Tabela \ref{tab:resultados} exibe os resultados das 10 (dez) execuções do algoritmo para alguns valores de $k$. A coluna ``Baseline"{} apresenta o total de vértices ativados no trabalho de \cite{kempe2003maximizing}{}. É possível verificar que os total de vértices ativados foi maior para todos os valores de k, tanto em média quanto na mediana. É possível verificar houve um baixo desvio padrão ($\sigma$) entre as dez execuções, exceção feita para $k=20$ em o total de vértices ativos no final da execução foi igual a $k$ (zero ativações adicionais) o que explica um maior desvio para aquela configuração.
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+\rowcolor[HTML]{C0C0C0} 
+{\bf $|V|$} & {\bf $|C|$} & {\bf $\frac{|C|}{|V|}$} & {\bf $k$} & {\bf Média($\bar{x}$)} & {\bf Mediana ($\mu$) } & {\bf Devio Padrao($\sigma$)} & {\bf Valor Máximo} & {\bf Baseline} \\ \hline
+ &  &  & 5 & 2153,8 & 2150,5 & 17,24 & 2193 & 200 \\ \cline{4-9} 
+ &  &  & 10 & 2156,4 & 2153,5 & 20,33 & 2194 & 480 \\ \cline{4-9} 
+ &  &  & 15 & 2160,6 & 2157,5 & 22,92 & 2199 & 600 \\ \cline{4-9} 
+ &  &  & 20 & 1937,4 & 2153 & 674,43 & 2190 & 790 \\ \cline{4-9} 
+ &  &  & 25 & 2208,4 & 2204,5 & 16,04 & 2238 & 950 \\ \cline{4-9} 
+\multirow{-6}{*}{9877} & \multirow{-6}{*}{8434} & \multirow{-6}{*}{0,85} & 30 & 2162,3 & 2161,5 & 13,80 & 2184 & 990 \\ \hline
+\end{tabular}
+}
+\caption{Resultados para diversos valores de k}
+\label{tab:resultados}
+\end{table}
+
+A Figura \ref{fig:grafico_comparativo} exibe um comparativos dos resultados obtidos pela heurística (vide coluna Valor Máximo) com aqueles descritos em \cite{kempe2003maximizing}. É possível verificar que a heurística conseguiu valores melhores em todos os valore de $k$, tenho um valor bastante superior mesmo para valor de $k$ menores. Também é possível que a variação do total de vértices ativados não acompanha o mesmo crescimento de $k$. Esta tendência pode ser observado na Figura \ref{fig:grafico_comparativo} bem como por meio do valor do desvio padrão $\sigma$ da coluna Valor Máximo. O valor de $\sigma$ é dado por $19,41$ um valor relativamente baixo. Neste sentido, considerando os valores obtidos pela heurística um valor de $k= 25$ seria o ideal.
+
+A tabela \ref{tab:ic_fracao} mostra a fração de vértices ativados para um intervalo de confiança igual a 95\% ($\lambda=0.05$){}\cite{jain2008art}. Conforme pode ser observado para a maiores dos valores de $k$ o percentual de vértices que ficariam ativados está na faixa de $21-22\%$. Este valor é obtido mesmo para valores pequenos de k ($k=5$), todavia, não altera como o crescimento do $k$ o que possivelmente é causado pela sobreposição influência entre os vértices.
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\rowcolor[HTML]{C0C0C0} 
+{\bf k} & {\bf MEDIA($\bar{x}$)} & {\bf DESV PADRAO($\sigma$)} & {\bf IC} & {\bf MIN} & {\bf MAX} \\ \hline
+5 & 0,21806 & 0,00175 & 0,00108 & 0,21698 & 0,21914 \\ \hline
+10 & 0,21833 & 0,00206 & 0,00128 & 0,21705 & 0,21960 \\ \hline
+15 & 0,21875 & 0,00232 & 0,00144 & 0,21731 & 0,22019 \\ \hline
+20 & 0,19615 & 0,06828 & 0,04232 & 0,15383 & 0,23847 \\ \hline
+25 & 0,22359 & 0,00162 & 0,00101 & 0,22258 & 0,22460 \\ \hline
+30 & 0,21892 & 0,00140 & 0,00087 & 0,21806 & 0,21979 \\ \hline
+\end{tabular}
+}
+\caption{Intervalo de confiança $\lambda = 0.05$ para a fração de vértices ativados}
+\label{tab:ic_fracao}
+\end{table}
+Apesar dos resultados se mostrarem superiores aqueles obtido por \cite{kempe2003maximizing}, a heurística proposta ainda está bem abaixo do melhor algoritmo descrito na literatura para problema \cite{Hochbaum:1996:ACP:241938.241941} que consegue um total de vértices ativado da ordem de $63\%${}.	
+		
 
 
-\begin{figure}[!t]
+\begin{figure}[ht]
 	\centering
-	\includegraphics[width=6.5in]{../img/grafico_total.eps}
-	\label{fig_vertex_cover}
+	\includegraphics[width=6.5in]{../img/grafico_comparativo.eps}
+	\label{fig:grafico_comparativo}
+	\caption{Comparativo dos resultados da heurística com o do baseline}
 
 \end{figure}
 
 \section{Trabalhos Relacionados}
 \label{sec:trab_relacionados}
 
+No trabalho de \cite{domingos2001mining} é proposto um modelo com o objetivo de mensurar o valor da rede sobre um consumidor, ou seja, a receita esperada pelo fato de um consumidor influenciar a compra de um produto por outro usuário na rede. Os autores avaliam a abordagem proposta em um banco de dados de filtragem colaborativa. Este trabalho é um dos pioneiros com relação a avaliação do efeito na rede na probabilidade de compra de um consumidor. 
+
+Em \cite{richardson2002mining} é realizada uma mineração de dados em redes sociais com o objetivo de construir um modelo probabilístico que possibilite melhor plano para um ``marketing viral"{}. Os resultados possibilitaram a redução do custo do marketing por consumidor, além do mais a abordagem é escalável o que mostra sua possível aplicação em dados de redes sociais reais.
+
+No artigo \ref{chen2009efficient} é proposto uma heurística para resolver o Problema Máxima Influência. Os objetivos do trabalho são superar o algoritmo guloso original proposto por \cite{kempe2003maximizing} no tocante à reduzir o tempo de execução e propor novas heurísticas que visem melhorar a abrangência da influência dentre da rede. Os resultados mostraram uma melhoria de $15\%$ a $34\%$ no tempo de execução da abordagem proposta. 
+
+Em \cite{kempe2003maximizing} é proposto um algoritmo guloso para solucionar o problema da Máxima Influência. Eles utilizaram três outras heurísticas visando avaliar o seu algoritmo: $(i)$ na primeira abordagem os vértices em $A_{0}$ forame escolhidas randomicamente; $(ii)$ na segunda heurística, foram escolhidos $k$ vértices em ordem decrescente de seus graus $d_{v}$; $(iii)$ A terceira abordagem utilizou o conceito de \textit{Distance centrality} \cite{scott2012social}, que é uma  medida influência largamente utilizada na sociologia, e parte do pressuposto de que vértices mais próximos terão mais chances de influenciar uns aos outros.
 
 \section{Ameaças à Validade}
 \label{sec:ameacas}
-\begin{itemize}
 		
-		\item Modelo de Propagação é artificial
-		\item A métrica \textsc{DEGREE ACESSS}{} não foi validada.
-		\item Modelo aplicado a um único grafo.
-		\item A escalabilidade da heurística não foi testada.		
-	\end{itemize}
+Apesar dos resultados satisfatórios discutidos na Seção \ref{sec:resultados} algumas ameaças à validade devem ser discutidas. A primeira delas é o fato do Modelo de Propagação ser bastante artificial. Em um caso real o simples fato de alguns amigos compraram um produto não levará efetivamente que um consumidor também o compre. Como os resultados são diretamente dependentes do modelo de propagação, os resultados podem ser devidos à simplicidade do modelo. Existem modelos mais complexos \cite{goldenberg2001talk,goldenberg2001using}{} que podem ser aplicados com o objetivo de avaliar o impacto nos resultados.
+
+Um segundo ponto a ser discutido é com relação a métrica \textsc{DEGREE ACESSS}{}. Não existe na literatura estudo que avaliem a efetividade da métrica na escolha de vértice que melhorem a influência na rede. Desta forma, um maior número de estudos deveriam ser realizados a fim de avaliar a métrica proposta. 
+
+Para finalizar cabe ressaltar que a heurística foi aplicada em único grafo. Neste sentido, não há como generalizar os resultados. Desta forma, é primordial que o modelo ora proposto seja aplicado em diversos grafos que representem redes sociais como objetivo de verificar se a heurística é dependente ou não da estrutura da rede.
 
 \section{Conclusões e Trabalhos Futuros}
 
-\begin{itemize}
-		
-		\item Heurística alcançou resultados satisfatórios.
-		\item Heurística proposta possibilita refinamentos.
-		\item Aplicação em grafos reais.
-		\item Utilização de outros característica das redes sociais para a escolha gulosa.			
-		
-	\end{itemize}	
+Este trabalho se propôs em resolver o problema da Máxima Influência em uma rede social. A partir de uma heurística baseada na Cobertura de Vértice foi verificado o total de vértice que comprariam um determinado produto se um $k$ inicialmente realizassem a mesma compra. A propagação da influência foi realizada utilizando o modelo de propagação conhecido como \textit{Linear Threshold Model}{}. Foi proposto um algoritmo guloso que utiliza a métrica denominada \textsc{DEGREE ACESSS}{}.
+
+A heurística proposta alcançou resultados satisfatórios em comparação com o baseline utilizado. Ademais, o modelo proposto é bem flexível o que possibilita refinamentos na métrica proposta. Como trabalhos futuros é proposto a aplicação da heurística em grafos reais para verificar a escalabilidade da mesma. Um outro desdobramento do trabalho é a utilização de outros característica das redes sociais em conjunto com o textsc{DEGREE ACESSS}{} para melhorar a escolha gulosa.			
 
 \bibliographystyle{sbc}
 \bibliography{../bib/proposta-ref}
